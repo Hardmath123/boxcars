@@ -1,11 +1,8 @@
 #lang racket
+(provide box-and-pointer-diagram!)
 
+; Generic (mutable and immutable) pair ops
 (require scheme/mpair)
-
-; A cell
-
-(define tracked-poses (make-hasheq))
-
 (define (gcar x)
   (cond [(mpair? x) (mcar x)]
         [(pair? x)  (car x)]))
@@ -17,14 +14,27 @@
 (define (gpair? x)
   (or (pair? x) (mpair? x)))
 
+; External interface
+(define target '())
+(define (box-and-pointer-diagram! x)
+  (if (not (gpair? x))
+      (error (format "~a is not a pair!" x))
+      (set! target x)))
+
+; A cell
+(define tracked-poses (make-hasheq))
 (struct pos
   (x y dx dy)
   #:mutable
   #:transparent)
 
-;(define test (mcons 'a 'c))
-;(set-mcar! test (mcons 'a 'b))
-;(set-mcdr! test '(1 2 3))
+
+; Some test cases to enjoy
+(define test (mcons 'a 'c))
+(set-mcar! test (mcons 'a 'b))
+(set-mcdr! test '(1 2 3))
+;(set-mcar! (gcar test) (gcdr (gcdr (gcdr test))))
+;(set-mcar! test '(1 2 3))
 
 (define a '(1 2 3))
 (define b a)
@@ -32,10 +42,8 @@
 (define d (cons (cadr a) (list (cdr b) (caddr c))))
 ;(set! a 5)
 (define e (cons d d))
-(define test e)
-;(set-mcar! (gcar test) (gcdr (gcdr (gcdr test))))
-;(set-mcar! test '(1 2 3))
 
+; Drawing, physics, etc.
 (define (track! pr suggested-pos)
   (begin
     (hash-set! tracked-poses pr suggested-pos)
@@ -72,7 +80,7 @@
   (when (not (equal? p1 p2))
     (define rate
       (* +1 k (- 70 (sqrt (+ (expt (- (pos-x p1) (pos-x p2)) 2)
-                              (expt (- (pos-y p1) (pos-y p2)) 2))))))
+                             (expt (- (pos-y p1) (pos-y p2)) 2))))))
     (define x-dir (- (pos-x p1) (pos-x p2)))
     (define y-dir (- (pos-y p1) (pos-y p2)))
     
@@ -163,7 +171,8 @@
         (send dc set-origin (- 10 minx) (- 10 miny))))
     (send dc set-brush "black" 'transparent)
     (define visited (make-hasheq))
-    (draw-pair dc test visited #:root #t)
+    (when (gpair? target)
+      (draw-pair dc target visited #:root #t))
     (set! tracked-poses visited)))
 
 (define can
