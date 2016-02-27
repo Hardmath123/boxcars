@@ -10,3 +10,5 @@ pop up, and `(box-and-pointer-diagram! '(1 2 3))` to load up a pair to inspect.
 
 Boxcars works with both normal pairs and mutable `mpair`s, so you can mutate
 data structures and see how they affect the diagram instantaneously.
+
+This project is completely free to use, and MIT-licensed. Enjoy!
