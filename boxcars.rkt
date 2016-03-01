@@ -28,21 +28,6 @@
   #:mutable
   #:transparent)
 
-
-; Some test cases to enjoy
-(define test (mcons 'a 'c))
-(set-mcar! test (mcons 'a 'b))
-(set-mcdr! test '(1 2 3))
-;(set-mcar! (gcar test) (gcdr (gcdr (gcdr test))))
-;(set-mcar! test '(1 2 3))
-
-(define a '(1 2 3))
-(define b a)
-(define c (list 1 2 3))
-(define d (cons (cadr a) (list (cdr b) (caddr c))))
-;(set! a 5)
-(define e (cons d d))
-
 ; Drawing, physics, etc.
 (define (track! pr suggested-pos)
   (begin
@@ -112,7 +97,7 @@
               (let ([npos (draw-pair dc (gcar pr) visited
                                      (pos
                                       (- (pos-x mpos) 10)
-                                      (+ (pos-y mpos) 10)
+                                      (+ (pos-y mpos) 5)
                                       0
                                       0))])
                 (pos-attract! mpos npos)
@@ -129,7 +114,7 @@
               (let ([npos (draw-pair dc (gcdr pr) visited
                                      (pos
                                       (+ (pos-x mpos) 10)
-                                      (+ (pos-y mpos) 10)
+                                      (+ (pos-y mpos) 5)
                                       0
                                       0))])
                 (pos-attract! mpos npos)
@@ -173,7 +158,10 @@
     (define visited (make-hasheq))
     (when (gpair? target)
       (draw-pair dc target visited #:root #t))
-    (set! tracked-poses visited)))
+    (set! tracked-poses visited)
+    (send win set-label
+          (format "Box-and-pointer diagram [~a boxes]"
+                  (hash-count tracked-poses)))))
 
 (define can
   (new canvas%
